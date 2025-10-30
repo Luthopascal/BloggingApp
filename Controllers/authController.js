@@ -205,9 +205,59 @@ const logoutUser = async (req, res) => {
   }
 };
 
+//UPDATE BLOG POST WITH AUTHORIZATION (protected route)
+
+const updateblogposts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, subtitle, content, imageUrl } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid blog post ID'
+      });
+    }
+
+    const post = await BlogPost.findById(id);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Blog post not found'
+      });
+    }
+
+    if (post.author.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You are not authorized to update this post'
+      });
+    }
+
+    if (title) post.title = title;
+    if (subtitle) post.subtitle = subtitle;
+    if (content) post.content = content;
+    if (imageUrl) post.imageUrl = imageUrl;
+
+    await post.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Blog post updated successfully',
+      data: post
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
+};
 
 
 
 
 // Export the function AFTER defining it
-module.exports = { registerUser , loginUser, blogPost, NewPost, logoutUser}; // export both and import into routes file
+module.exports = { registerUser , loginUser, blogPost, NewPost, logoutUser, updateblogposts}; // export both and import into routes file
