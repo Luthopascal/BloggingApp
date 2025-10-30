@@ -1,8 +1,11 @@
 // all routes are defined here
 const express = require("express");
+const mongoose = require("mongoose");
 
 //const {register} = require("../Controllers/authController");
-const { registerUser, loginUser } = require("../../Controllers/authController"); // Import the register function from the authController
+const { registerUser, loginUser, NewPost , blogPost} = require("../../Controllers/authController"); // Import the register function from the authController
+//const { } = require("../../Middleware/authMiddleware"); // Import the authMiddleware (not used here but can be applied to protect routes)
+const authMiddleware = require("../../Middleware/authMiddleware");
 
 const router = express.Router(); // Create a new router object
 
@@ -10,6 +13,9 @@ router.post("/register", registerUser)  // Define a POST route for user registra
 
 router.post("/login",loginUser)  // Define a POST route for user login (functionality to be implemented)
 
+router.post("/NewBlogPost",authMiddleware, NewPost)  // Define a POST route for creating a new blog post (functionality to be implemented)
+
+router.get('/BlogPost/:id',authMiddleware, blogPost)  // Define a GET route for fetching a blog post by title (functionality to be implemented)
 
 
 module.exports = router; // Export the router to be used in other parts of the application
